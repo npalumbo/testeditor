@@ -22,7 +22,7 @@ func (i *internalTextStorage) SearchAndReplace(search, replace string) {
 func (i *internalTextStorage) findSubstringRange(substr string) (int, int, bool) {
 	start := strings.Index(i.rawText, substr)
 	if start == -1 {
-		return 0, 0, false // Substring not found
+		return 0, 0, false
 	}
 	end := start + len(substr)
 	return start, end, true

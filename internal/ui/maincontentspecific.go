@@ -2,39 +2,39 @@ package ui
 
 import (
 	cursor2 "testeditor/internal/cursor"
-	testeditorText "testeditor/internal/text"
+	testeditorText "testeditor/internal/textspecific"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 )
 
-type MainContent struct {
+type MainContentSpecific struct {
 	mainWindow fyne.Window
 	container  *fyne.Container
 	Text       *widget.TextGrid
 	cursor     *cursor2.Cursor
 	//
-	textBackend testeditorText.TextBackend
+	textBackend testeditorText.TextBackendSpecific
 }
 
-func (m *MainContent) MakeUI() fyne.CanvasObject {
+func (m *MainContentSpecific) MakeUI() fyne.CanvasObject {
 	return m.container
 }
 
-func CreateMainContent(parent fyne.Window) MainContent {
+func CreateMainContentSpecific(parent fyne.Window) MainContentSpecific {
 
 	cursor := cursor2.CreateCursor()
 	text := widget.NewTextGridFromString("Edit me")
 	currentContainer := container.NewBorder(nil, cursor.DebugLabel, nil, nil, text)
 
 	currentContainer.Add(text)
-	mainContent := MainContent{
+	mainContent := MainContentSpecific{
 		mainWindow:  parent,
 		container:   currentContainer,
 		Text:        text,
 		cursor:      cursor,
-		textBackend: testeditorText.CreateInternalText(),
+		textBackend: testeditorText.CreateInternalTextSpecific(),
 	}
 
 	parent.Canvas().SetOnTypedKey(func(ke *fyne.KeyEvent) {
@@ -43,14 +43,14 @@ func CreateMainContent(parent fyne.Window) MainContent {
 			mainContent.mainWindow.Close()
 		case fyne.KeyBackspace:
 			if mainContent.cursor.CanBackspace() {
-				mainContent.textBackend.Delete(mainContent.cursor.CurrentPosition()-1, mainContent.cursor.CurrentPosition())
+				mainContent.textBackend.Backspace(*mainContent.cursor)
 				mainContent.cursor.Dec()
 			}
 		case fyne.KeySpace:
-			mainContent.textBackend.Insert(mainContent.cursor.CurrentPosition(), " ")
+			mainContent.textBackend.Insert(*mainContent.cursor, " ")
 			mainContent.cursor.Inc()
 		default:
-			mainContent.textBackend.Insert(mainContent.cursor.CurrentPosition(), string(ke.Name))
+			mainContent.textBackend.Insert(*mainContent.cursor, string(ke.Name))
 			mainContent.cursor.Inc()
 		}
 		mainContent.Text.SetText(mainContent.textBackend.Render())
